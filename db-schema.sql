@@ -65,6 +65,72 @@ CREATE TABLE IF NOT EXISTS booking_rooms (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Create service_area_zip_codes table
+CREATE TABLE IF NOT EXISTS service_area_zip_codes (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  zip_code VARCHAR(10) UNIQUE NOT NULL,
+  city VARCHAR(100) NOT NULL,
+  state VARCHAR(10) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Insert some default service area zip codes (Tampa Bay area examples)
+INSERT INTO service_area_zip_codes (zip_code, city, state) VALUES
+('33602', 'Tampa', 'FL'),
+('33603', 'Tampa', 'FL'),
+('33604', 'Tampa', 'FL'),
+('33605', 'Tampa', 'FL'),
+('33606', 'Tampa', 'FL'),
+('33607', 'Tampa', 'FL'),
+('33608', 'Tampa', 'FL'),
+('33609', 'Tampa', 'FL'),
+('33610', 'Tampa', 'FL'),
+('33611', 'Tampa', 'FL'),
+('33612', 'Tampa', 'FL'),
+('33613', 'Tampa', 'FL'),
+('33614', 'Tampa', 'FL'),
+('33615', 'Tampa', 'FL'),
+('33616', 'Tampa', 'FL'),
+('33617', 'Tampa', 'FL'),
+('33618', 'Tampa', 'FL'),
+('33619', 'Tampa', 'FL'),
+('33620', 'Tampa', 'FL'),
+('33621', 'Tampa', 'FL'),
+('33622', 'Tampa', 'FL'),
+('33623', 'Tampa', 'FL'),
+('33624', 'Tampa', 'FL'),
+('33625', 'Tampa', 'FL'),
+('33626', 'Tampa', 'FL'),
+('33629', 'Tampa', 'FL'),
+('33634', 'Tampa', 'FL'),
+('33635', 'Tampa', 'FL'),
+('33637', 'Tampa', 'FL'),
+('33647', 'Tampa', 'FL'),
+('33701', 'St. Petersburg', 'FL'),
+('33702', 'St. Petersburg', 'FL'),
+('33703', 'St. Petersburg', 'FL'),
+('33704', 'St. Petersburg', 'FL'),
+('33705', 'St. Petersburg', 'FL'),
+('33706', 'St. Petersburg', 'FL'),
+('33707', 'St. Petersburg', 'FL'),
+('33708', 'St. Petersburg', 'FL'),
+('33709', 'St. Petersburg', 'FL'),
+('33710', 'St. Petersburg', 'FL'),
+('33711', 'St. Petersburg', 'FL'),
+('33712', 'St. Petersburg', 'FL'),
+('33713', 'St. Petersburg', 'FL'),
+('33714', 'St. Petersburg', 'FL'),
+('33715', 'St. Petersburg', 'FL'),
+('33716', 'St. Petersburg', 'FL'),
+('33781', 'St. Petersburg', 'FL'),
+('33782', 'St. Petersburg', 'FL'),
+('33785', 'St. Petersburg', 'FL'),
+('33786', 'St. Petersburg', 'FL')
+ON CONFLICT (zip_code) DO NOTHING;
+
+-- Create index for zip code lookups
+CREATE INDEX IF NOT EXISTS idx_service_area_zip_codes_zip ON service_area_zip_codes(zip_code);
+
 -- Insert default services
 INSERT INTO services (name, description, icon, fixed_price) VALUES
 ('Carpet Cleaning', 'Deep clean your carpets to remove dirt, stains, and allergens', '🧹', 89.00),

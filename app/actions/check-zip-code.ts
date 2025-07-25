@@ -1,51 +1,52 @@
 "use server"
 
-import { createClient } from "@supabase/supabase-js"
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseKey)
+import { supabase } from "@/lib/supabase"
 
 export async function checkZipCodeInServiceArea(zipCode: string) {
   try {
-    console.log("Checking ZIP code:", zipCode)
+    // Normalize the zip code by trimming and ensuring it's a string
+    const normalizedZipCode = zipCode.trim()
 
-    // Query the service_area_zip_codes table
-    const { data, error } = await supabase
-      .from("service_area_zip_codes")
-      .select("zip_code, city, state")
-      .eq("zip_code", zipCode)
-      .single()
+    console.log(`Checking zip code: "${normalizedZipCode}"`)
+
+    const { data, error } = await supabase.from("service_area_zip_codes").select("*").eq("zip_code", normalizedZipCode)
 
     if (error) {
-      console.error("Database error:", error)
+      console.error("Error checking zip code:", error)
       return {
-        isValid: false,
+        isInServiceArea: false,
+        valid: false,
         error: "Error checking service availability",
       }
     }
 
-    if (data) {
-      console.log("ZIP code found:", data)
-      return {
-        isValid: true,
-        zipCode: data.zip_code,
-        city: data.city,
-        state: data.state,
-      }
-    }
+    // Log the result for debugging
+    console.log(`Zip code check result for ${normalizedZipCode}:`, data)
 
-    console.log("ZIP code not found in service area")
+    // Check if any data was returned (array with at least one item)
+    const isInServiceArea = data && data.length > 0
+
     return {
-      isValid: false,
-      error: "Sorry, we don't currently service this area",
+      isInServiceArea,
+      valid: isInServiceArea, // For backward compatibility
+      locationData: isInServiceArea ? { city: data[0].city, state: data[0].state } : null,
     }
   } catch (error) {
-    console.error("Unexpected error:", error)
+    console.error("Error checking zip code:", error)
     return {
-      isValid: false,
-      error: "An error occurred while checking service availability",
+      isInServiceArea: false,
+      valid: false,
+      error: "An unexpected error occurred",
     }
+  }
+}
+
+// Add the missing checkZipCode export
+export async function checkZipCode(zipCode: string) {
+  // This is an alias for checkZipCodeInServiceArea for backward compatibility
+  const result = await checkZipCodeInServiceArea(zipCode)
+  return {
+    ...result,
+    valid: result.isInServiceArea, // Ensure valid property is set based on isInServiceArea
   }
 }
